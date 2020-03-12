@@ -45,7 +45,7 @@ class MergeSHPfiles(object):
         fileList = list()
         if os.path.exists(directory):
             if os.path.isdir(directory):
-                for x in os.walk("."):
+                for x in os.walk(directory):
                     tmpDir = x[0]
                     self.look_for_shpfile(tmpDir, fileList, extension)
         for file in fileList:

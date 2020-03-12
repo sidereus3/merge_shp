@@ -42,15 +42,13 @@ class MergeSHPfiles(object):
         gdf.to_file(dest)
 
     def recursive_find_files(self, directory, extension):
-        fileList = list()
+        file_list = list()
         if os.path.exists(directory):
             if os.path.isdir(directory):
                 for x in os.walk(directory):
-                    tmpDir = x[0]
-                    self.look_for_shpfile(tmpDir, fileList, extension)
-        for file in fileList:
-            print("Checked: " + file)
-        return  fileList
+                    tmp_dir = x[0]
+                    self.look_for_shpfile(tmp_dir, file_list, extension)
+        return file_list
 
     def look_for_shpfile(self, directory, file_list, extension):
         if "spatial" in directory:
@@ -63,10 +61,10 @@ class MergeSHPfiles(object):
     # A function to test the file extension of a file
     def check_file_extension(self, filename, extension):
         # Boolean variable to be returned by the function
-        found_extension = False;
+        found_extension = False
         # Split the filename into two parts (name + ext)
         filename_split = os.path.splitext(filename)
-        # Get the file extension into a varaiable
+        # Get the file extension into a variable
         file_extension = filename_split[1].strip()
         # Decide whether extensions are equal
         if file_extension == extension:

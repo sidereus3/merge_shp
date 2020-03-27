@@ -40,7 +40,6 @@ class MergeSHPfiles(object):
         for file in shpfiles:
             command += ' ' + file
 
-        print(command)
         os.system(command)
 
     def recursive_find_files(self, directory, extension, srcprefix, fileprefix):

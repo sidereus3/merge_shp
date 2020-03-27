@@ -47,8 +47,8 @@ class ClientThread(threading.Thread):
     def run(self):
 
         lock.acquire()
-        ia_cult = gpd.read_file(self.cult)
         ssa = self.get_shapefile()
+        cultivated = gpd.read_file(self.cult)
         lock.release()
 
         while ssa is not None:
@@ -60,8 +60,8 @@ class ClientThread(threading.Thread):
             iassa = gpd.read_file(ssa)
 
             print(ssa)
-            over = gpd.overlay(iassa, ia_cult, how="intersection")
-            centr = over.centroid
+            over = gpd.overlay(iassa, cultivated, how="intersection")
+            centr = over.representative_point()
 
             oversavepath = os.path.join(savepath, "over")
             centrsavepath = os.path.join(savepath, "centr")
@@ -88,10 +88,10 @@ if __name__ == "__main__":
 
     try:
         mapunits = args[1]
-        cultiv = args[2])
+        cultiv = args[2]
     except IndexError:
-        raise SystemExit(f"Usage: {args[0] <mapunits path> <cultivated path>}")
-    
+        raise SystemExit(f"Usage: {args[0]} <mapunits path> <cultivated US map>")
+
     pp = Preproc()
     shapefileList = pp.recursive_find_files(mapunits, '.shp')
 

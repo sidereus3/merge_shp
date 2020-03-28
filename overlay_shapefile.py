@@ -41,14 +41,13 @@ class ClientThread(threading.Thread):
     def __init__(self, id, cult, shapefileList):
         threading.Thread.__init__(self)
         self.id = id
-        self.cult = cult
+        self.cultivated = cult
         self.shapefileList = shapefileList
 
     def run(self):
 
         lock.acquire()
         ssa = self.get_shapefile()
-        cultivated = gpd.read_file(self.cult)
         lock.release()
 
         while ssa is not None:
@@ -60,20 +59,39 @@ class ClientThread(threading.Thread):
             iassa = gpd.read_file(ssa)
 
             print(ssa)
-            over = gpd.overlay(iassa, cultivated, how="intersection")
+            over = gpd.overlay(iassa, self.cultivated, how="intersection")
             centr = over.representative_point()
 
             oversavepath = os.path.join(savepath, "over")
             centrsavepath = os.path.join(savepath, "centr")
+            centrllsavepath = os.path.join(savepath, "centrll")
             os.mkdir(oversavepath)
             os.mkdir(centrsavepath)
+            os.mkdir(centrllsavepath)
 
             over.to_file(os.path.join(oversavepath, "over.shp"))
             centr.to_file(os.path.join(centrsavepath, "centr.shp"))
 
+            centrll = gpd.read_file(os.path.join(centrsavepath, "centr.shp"))
+            centrll = self.addLatLon(centrll)
+            centrll.to_file(os.path.join(centrllsavepath, "centrll.shp"))
+
             lock.acquire()
             ssa = self.get_shapefile()
             lock.release()
+
+    def addLatLon(self, centr):
+        points = centr['geometry']
+        xlist = []
+        ylist = []
+
+        for p in points:
+            xlist.append(p.x)
+            ylist.append(p.y)
+
+        centr = centr.assign(lon=xlist)
+        centr = centr.assign(lat=ylist)
+        return centr
 
     def get_shapefile(self):
         if not self.shapefileList:
@@ -95,9 +113,11 @@ if __name__ == "__main__":
     pp = Preproc()
     shapefileList = pp.recursive_find_files(mapunits, '.shp')
 
+    cultivated = gpd.read_file(cultiv)
+
     count = 8
     lock = threading.Lock()
-    threads = [ClientThread(i, cultiv, shapefileList) for i in range(count)]
+    threads = [ClientThread(i, cultivated, shapefileList) for i in range(count)]
 
     for i in range(count):
         threads[i].start()

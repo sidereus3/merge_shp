@@ -86,8 +86,8 @@ class ClientThread(threading.Thread):
         ylist = []
 
         for p in points:
-            xlist.append(p.x)
-            ylist.append(p.y)
+            xlist.append(round(p.x, 4))
+            ylist.append(round(p.y, 4))
 
         centr = centr.assign(lon=xlist)
         centr = centr.assign(lat=ylist)

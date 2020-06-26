@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+STATELOWER="ak"
+STATE="alaska"
+
+grass76 -e -c ~/Desktop/crp/download/${STATELOWER}/${STATELOWER}_boundary_4326/${STATELOWER}_boundary_4326.shp grassdata/${STATE}_4326
+mkdir ~/Desktop/crp/download/${STATELOWER}/${STATELOWER}_cult_4326
+grass76 -c grassdata/${STATE}_4326/cultivated --exec v.in.ogr -e input=~/Desktop/crp/download/${STATELOWER}/${STATELOWER}_boundary_4326/${STATELOWER}_boundary_4326.shp output=${STATELOWER}_boundary --overwrite
+grass76 -c grassdata/${STATE}_4326/cultivated --exec g.region vector=${STATELOWER}_boundary
+grass76 -c grassdata/${STATE}_4326/cultivated --exec r.in.gdal -r input=/mnt/shinobi_data/projects/crp/gis_analysis/cultivated_${STATELOWER}/cultivated_${STATELOWER}_4326.tif output=raster_cultivated
+grass76 -c grassdata/${STATE}_4326/cultivated --exec g.region raster=raster_cultivated
+grass76 -c grassdata/${STATE}_4326/cultivated --exec r.to.vect input=raster_cultivated output=cultivated type=area
+
+grass76 -c grassdata/${STATE}_4326/cultivated --exec v.clip input=cultivated clip=${STATELOWER}_boundary output=${STATELOWER}_cultivated
+grass76 -c grassdata/${STATE}_4326/cultivated --exec v.out.ogr input=${STATELOWER}_cultivated output=/home/sidereus/Desktop/crp/download/${STATELOWER}/${STATELOWER}_cult_4326/${STATELOWER}_cultivated_4326.shp format=ESRI_Shapefile
+
+exit 0

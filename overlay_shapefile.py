@@ -69,12 +69,19 @@ class ClientThread(threading.Thread):
             os.mkdir(centrsavepath)
             os.mkdir(centrllsavepath)
 
-            over.to_file(os.path.join(oversavepath, "over.shp"))
-            centr.to_file(os.path.join(centrsavepath, "centr.shp"))
+            if over.empty == True:
+                print(ssa + " overlay is empty")
+            else:
+                over.to_file(os.path.join(oversavepath, "over.shp"))
 
-            centrll = gpd.read_file(os.path.join(centrsavepath, "centr.shp"))
-            centrll = self.addLatLon(centrll)
-            centrll.to_file(os.path.join(centrllsavepath, "centrll.shp"))
+            if centr.empty == True:
+                print(ssa + " centr is empty")
+            else:
+                centr.to_file(os.path.join(centrsavepath, "centr.shp"))
+                centrll = gpd.read_file(os.path.join(centrsavepath, "centr.shp"))
+                centrll = self.addLatLon(centrll)
+                centrll.to_file(os.path.join(centrllsavepath, "centrll.shp"))
+
 
             lock.acquire()
             ssa = self.get_shapefile()

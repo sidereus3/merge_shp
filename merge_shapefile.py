@@ -22,6 +22,10 @@ class MergeSHPfiles(object):
         print(dest)
         print(srcprefix)
         print(fileprefix)
+
+        if not os.path.exists(dest):
+            os.mkdir(dest)
+
         if not os.path.exists(src):
             print("Src path " + src + " does not exist")
         elif not os.path.isdir(src):
